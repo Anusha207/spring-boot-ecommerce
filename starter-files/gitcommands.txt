@@ -1,0 +1,22 @@
+1.git init
+
+2.git add .
+
+3.git commit -m "commment"
+
+4.git status
+
+5.git log
+
+6.git add remote origin server_repo_url
+
+7.git push -u origin master
+
+8.git clone server_repo_url
+
+9.for git commit history
+git log --pretty=oneline
+
+10.git reset --soft logfilename(we need to get back previous commit back delete)
+
+11.
