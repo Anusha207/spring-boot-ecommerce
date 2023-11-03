@@ -3,6 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Product } from 'src/app/common/product';
 import { ProductService } from 'src/app/services/product.service';
 
+
+
 @Component({
   selector: 'app-products-list',
   templateUrl: './products-list-grid.component.html',
@@ -10,9 +12,17 @@ import { ProductService } from 'src/app/services/product.service';
 })
 export class ProductsListComponent implements OnInit {
   products!: Product[];
-  currentCategoryId!: number;
+  currentCategoryId: number=1;
+  previousCategoryId: number=1;
   // searchMode!:boolean;
   searchMode :boolean =false;
+  // new properties for pagination
+  thePagenumber:number=1;
+  thePagesize:number=5;
+  thetotalelements:number=0;
+  
+  previousKeyword:string="";
+
 
   constructor(private productservice:ProductService,private route:ActivatedRoute){}
   ngOnInit(): void {
@@ -32,12 +42,18 @@ export class ProductsListComponent implements OnInit {
     }
     handleSearchProducts(){
       const theKeyword:string=this.route.snapshot.paramMap.get('keyword')!;
+      //if we have diff keyword than previous
+      //then set thepagenumber to 1
+      if(this.previousKeyword!=theKeyword){
+        this.thePagenumber=1;
+      }
+      this.previousKeyword=theKeyword;
+      console.log(`keyword=${theKeyword},thePageNumber=${this.thePagenumber}`);
+
       //now search the products using given keyword
-      this.productservice.searchProducts(theKeyword).subscribe(
-        data =>{
-          this.products=data;
-        }
-      )
+      this.productservice.searchProductsPaginate(this.thePagenumber-1,
+        this.thePagesize,
+        theKeyword).subscribe(this.processResult());
 
     }
    
@@ -55,15 +71,45 @@ export class ProductsListComponent implements OnInit {
            this.currentCategoryId=1;
    
          }
+
+         //check if we have a different category than previous
+         //not:Angular will resuse a component  if it is currently being viewed
+         //if we have a differemt category id than previous
+         if(this.previousCategoryId !=this.currentCategoryId)
+         {
+          this.thePagenumber=1;
+         }
+         this.previousCategoryId=this.currentCategoryId;
+         console.log(`currentCategoryId=${this.currentCategoryId},thepagenumber=${this.thePagenumber}`);
+
+
          //now get the products for the given category id
-         this.productservice.getProductList(this.currentCategoryId).subscribe(
-           data=>{
-             this.products=data;
-           }
-         )
+         this.productservice.getProductListPaginate(this.thePagenumber - 1,this.thePagesize,this.currentCategoryId).subscribe(this.processResult());
+         ;
          
          
        
+    }
+    updatePageSize(pagesize:string){
+      this.thePagesize=+pagesize;
+      this.thePagenumber=1;
+      this.listproducts();
+
+    }
+    processResult(){
+      return (data:any)=>{
+        this.products=data._embedded.products;
+        this.thePagenumber=data.page.number + 1;
+        this.thePagesize=data.page.size;
+        this.thetotalelements=data.page.totalElements;
+
+      };
+
+    }
+    addToCart(theProduct:Product){
+      console.log(`Adding to cart:${theProduct.name},${theProduct.unitPrice}`)
+      // TODO ...do the real work
+      
     }
 
 }
