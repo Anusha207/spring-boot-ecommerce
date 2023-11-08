@@ -8,10 +8,13 @@ import { ProductCategory } from '../common/product-category';
   providedIn: 'root'
 })
 export class ProductService {
+  // getProductCategories() {
+  //   throw new Error('Method not implemented.');
+  // }
  
  
 
-  private baseUrl="http://localhost:8080/api/products"
+  private baseUrl="http://localhost:8080/api/products";
   private categoryUrl="http://localhost:8080/api/product-category";
   constructor(private httpclient:HttpClient) { }
 
@@ -48,9 +51,9 @@ export class ProductService {
     private getProducts(serachUrl: string): Observable<Product[]> {
       return this.httpclient.get<GetResponseProducts>(serachUrl).pipe(map(response => response._embedded.products));
     }
-    // getProductCategories():Observable<ProductCategory[]> {
-    //   return this.httpclient.get<GetResponseProductCategory>(this.categoryUrl).pipe(map(response=>response._embedded.productCategories))
-    // }
+    getProductCategories():Observable<ProductCategory[]> {
+      return this.httpclient.get<GetResponseProductCategory>(this.categoryUrl).pipe(map(response=>response._embedded.productCategory))
+    }
     getProduct(theProductId: number):Observable<Product> {
       
       const productUrl=`${this.baseUrl}/${theProductId}`;
@@ -68,8 +71,8 @@ interface GetResponseProducts{
     number :number
   }
 }
-// interface GetResponseProductCategory{
-//   _embedded:{
-//     productCategories:ProductCategory[];
-//   }
-// }
+interface GetResponseProductCategory{
+  _embedded:{
+    productCategory:ProductCategory[];
+  }
+}

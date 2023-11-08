@@ -11,6 +11,7 @@ import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.http.HttpMethod;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 
@@ -19,14 +20,17 @@ import java.util.List;
 import java.util.Set;
 
 @Configuration
+@CrossOrigin("http://localhost:4200")
 
 public class MyDataRestConfig implements RepositoryRestConfigurer {
     private EntityManager entityManager;
     @Autowired
     public MyDataRestConfig(EntityManager theEntityManager){
+
         entityManager=theEntityManager;
     }
     @Override
+
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         RepositoryRestConfigurer.super.configureRepositoryRestConfiguration(config, cors);
         HttpMethod[] theUnsuppoertedActions={HttpMethod.PUT,HttpMethod.POST,HttpMethod.DELETE};
